@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+    <template id="search_template_warehouses">
+        <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="fa fa-book"/>
+            Warehouses:
+            <t t-set="selected_warehouses" t-value="', '.join(warehouse.get('code') for warehouse in options['warehouses'] if warehouse.get('selected'))"/>
+            <t t-if="selected_warehouses">
+                <t t-esc="selected_warehouses"/>
+            </t>
+            <t t-else="">
+                All
+            </t>
+        </a>
+        <div class="dropdown-menu o_filters_menu" role="menu">
+            <t t-foreach="options['warehouses']" t-as="j">
+                <t t-if="j.get('id') == 'divider'">
+                    <div role="separator" class="dropdown-divider"/>
+                    <b role="menuitem" class="ml4 dropdown-item-text"><t t-esc="j.get('name')"/></b>
+                    <div role="separator" class="dropdown-divider"/>
+                </t>
+                <t t-if="j.get('id') != 'divider'">
+                    <a role="menuitem" class="dropdown-item js_generic_report_choice_filter" t-att-title="j.get('name')+ '-' + j.get('code')" t-att-data-id="j.get('id')" data-filter="warehouses"><t t-esc="j.get('name')"/></a>
+                </t>
+            </t>
+        </div>
+    </template>
+
+    <template id="search_template_product">
+        <a type="button" class="dropdown-toggle generic_product_filter" data-toggle="dropdown">
+            <span class="fa fa-folder-open"/> Products
+        </a>
+        <div class="dropdown-menu o_filters_menu" role="menu">
+            <t t-if="options.get('product_ids') != None" t-call="xb_generic_reports.search_auto_complete">
+                <t t-set="key" t-valuef="product"/>
+                <t t-set="model" t-valuef="product.product"/>
+                <t t-set="label" t-valuef="Products"/>
+                <t t-set="dataFilter" t-valuef="product_ids"/>
+                <t t-set="multiple" t-value="True"/>
+                <t t-set="forceClick" t-valuef=".generic_product_filter" />
+                <t t-set="initValues" t-value="options.get('selected_products')"/>
+            </t>
+            <t t-if="options.get('product_categories') != None" t-call="xb_generic_reports.search_auto_complete">
+                <t t-set="key" t-valuef="product_category"/>
+                <t t-set="model" t-valuef="product.category"/>
+                <t t-set="label" t-valuef="Product Categories"/>
+                <t t-set="dataFilter" t-valuef="product_categories"/>
+                <t t-set="multiple" t-value="True"/>
+                <t t-set="forceClick" t-valuef=".generic_product_filter" />
+                <t t-set="initValues" t-value="options.get('selected_product_categories')"/>
+            </t>
+            <div class="dropdown-divider o_generic_divider" role="separator"></div>
+        </div>
+    </template>
+
+    <template id="search_template_operation_types">
+        <a type="button" class="dropdown-toggle stock_operation_type_filter" data-toggle="dropdown">
+            <span class="fa fa-book"/>
+            Operation Types
+        </a>
+        <div class="dropdown-menu o_filters_menu" role="menu">
+             <t t-call="xb_generic_reports.search_auto_complete">
+                <t t-set="key" t-valuef="operation_types"/>
+                <t t-set="model" t-valuef="stock.picking.type"/>
+                <t t-set="label" t-valuf="''"/>
+                <t t-set="dataFilter" t-valuef="picking_type_ids"/>
+                <t t-set="multiple" t-value="True"/>
+                <t t-set="forceClick" t-valuef=".stock_operation_type_filter" />
+                <t t-set="initValues" t-value="options.get('selected_operation_types')"/>
+            </t>
+        </div>
+    </template>
+    
+
+
+    <template id="search_template" inherit_id="xb_generic_reports.search_template" primary="True">
+        <xpath expr="//div[hasclass('filter_partner')]" position="after">
+            <div class="btn-group o_dropdown o_generic_reports_filter filter_warehouses" t-if="options.get('warehouses') != None">
+                <t t-call="xb_stock_reports.search_template_warehouses"/>
+            </div>
+            <div class="btn-group o_dropdown o_generic_reports_filter filter_operation_types" t-if="options.get('operation_types') != None">
+                <t t-call="xb_stock_reports.search_template_operation_types"/>
+            </div>
+            <div t-if="options.get('product')" class="btn-group o_dropdown o_generic_reports_filter filter_product">
+                <t t-call="xb_stock_reports.search_template_product"/>
+            </div>
+            
+        </xpath>
+    </template>
+
+    </data>
+</odoo>
